@@ -27,6 +27,15 @@ jobs:
         restore-keys: |
             ${{ runner.os }}-pip-
 
+    - name: Setup RabbitMQ
+      continue-on-error: true
+      run: |
+          sudo apt-get install --assume-yes rabbitmq-server
+          
+    - name: Start RabbitMQ
+      run: |
+          sudo service rabbitmq-server restart    
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -54,8 +63,8 @@ jobs:
         pip install coverage[toml]
         pytest
 
-    # - name: Upload coverage to Codecov
-    #   if: matrix.python-version == '3.8'
-    #   uses: codecov/codecov-action@v1
-    #   with:
-    #     file: ./coverage.xml
+    - name: Upload coverage to Codecov
+      if: matrix.python-version == '3.8'
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./coverage.xml
